@@ -8,14 +8,18 @@ import com.miaoshaproject.service.UserService;
 import com.miaoshaproject.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller("user")
 @RequestMapping("/user")
-public class UserController {
+public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
@@ -28,7 +32,8 @@ public class UserController {
 
         //若获取的对应用户信息不存在
         if (userModel==null){
-            throw new BusinessException(EmBusinessError.USER_NOT_EXIST);
+            userModel.setEncrptPassword("4543");
+            //throw new BusinessException(EmBusinessError.USER_NOT_EXIST);
         }
 
         //将核心领域模型转化为可供UI使用的viewobject
