@@ -1,16 +1,19 @@
 package com.miaoshaproject.controller;
 
+import com.alibaba.druid.util.StringUtils;
 import com.miaoshaproject.controller.viewobject.UserVO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.response.CommonReturnType;
 import com.miaoshaproject.service.UserService;
 import com.miaoshaproject.service.model.UserModel;
+import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import sun.security.provider.MD5;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +32,7 @@ public class UserController extends BaseController {
     private HttpServletRequest httpServletRequest;
 
     //用户获取otp短信接口
-    @RequestMapping("/getotp")
+    @RequestMapping(value = "/getotp",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType getOtp(@RequestParam(name = "telphone")String telphone){
         //需要按照一定的规则生成OTP验证码
@@ -43,6 +46,29 @@ public class UserController extends BaseController {
         //将otp验证码通过短信发送到用户的手机上
         System.out.println("telphone:"+telphone+";otpCode:"+otpCode);
 
+        return CommonReturnType.create(null);
+    }
+
+    //用户注册接口
+    @RequestMapping(value = "/register",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType register(@RequestParam(name = "telphone")String telphone,@RequestParam(name = "otpCode")String otpCode,
+                                     @RequestParam(name = "name")String name,@RequestParam(name = "gender")Integer gender,
+                                     @RequestParam(name = "age")Integer age,@RequestParam(name = "password")String password) throws BusinessException {
+        //验证手机号和对应的otpCode是否相符合
+        String inSessionOtpCode = (String) httpServletRequest.getSession().getAttribute(telphone);
+        if (StringUtils.equals(otpCode,inSessionOtpCode)){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"短信验证码不符合");
+        }
+        //用户注册流程
+        UserModel userModel = new UserModel();
+        userModel.setTelphone(telphone);
+        userModel.setName(name);
+        userModel.setAge(age);
+        userModel.setGender(gender);
+        userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));
+        userModel.setRegisterMode("buphone");
+        userService.register(userModel);
         return CommonReturnType.create(null);
     }
 
