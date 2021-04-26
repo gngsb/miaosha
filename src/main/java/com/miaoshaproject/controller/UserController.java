@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import sun.security.provider.MD5;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +33,7 @@ public class UserController extends BaseController {
     //用户获取otp短信接口
     @RequestMapping(value = "/getotp",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
+    @CrossOrigin
     public CommonReturnType getOtp(@RequestParam(name = "telphone")String telphone){
         //需要按照一定的规则生成OTP验证码
         Random random = new Random();
@@ -65,7 +65,7 @@ public class UserController extends BaseController {
         userModel.setTelphone(telphone);
         userModel.setName(name);
         userModel.setAge(age);
-        userModel.setGender(gender);
+        userModel.setGender(new Byte(String.valueOf(gender.intValue())));
         userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));
         userModel.setRegisterMode("buphone");
         userService.register(userModel);
