@@ -76,6 +76,22 @@ public class UserController extends BaseController {
         return CommonReturnType.create(null);
     }
 
+    //用户登录接口
+    @RequestMapping(value = "/login",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType login(@RequestParam(name = "telphone")String telphone,@RequestParam(name = "password")String password) throws BusinessException, NoSuchAlgorithmException {
+        if (StringUtils.isEmpty(telphone)||StringUtils.isEmpty(password)){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+        UserModel userModel = userService.validateLogin(telphone,EncodeByMd5(password));
+
+        //将登录凭证加入到用户登录成功的session中
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
+
+        return CommonReturnType.create(null);
+    }
+
     public String EncodeByMd5(String str) throws NoSuchAlgorithmException {
         //确定计算方法
         MessageDigest md5 = MessageDigest.getInstance("MD5");
