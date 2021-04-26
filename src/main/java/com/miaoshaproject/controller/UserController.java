@@ -7,6 +7,7 @@ import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.response.CommonReturnType;
 import com.miaoshaproject.service.UserService;
 import com.miaoshaproject.service.model.UserModel;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,16 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 @Controller("user")
 @RequestMapping("/user")
+@CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
 public class UserController extends BaseController {
 
     @Autowired
@@ -33,7 +38,6 @@ public class UserController extends BaseController {
     //用户获取otp短信接口
     @RequestMapping(value = "/getotp",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
-    @CrossOrigin
     public CommonReturnType getOtp(@RequestParam(name = "telphone")String telphone){
         //需要按照一定的规则生成OTP验证码
         Random random = new Random();
@@ -54,10 +58,10 @@ public class UserController extends BaseController {
     @ResponseBody
     public CommonReturnType register(@RequestParam(name = "telphone")String telphone,@RequestParam(name = "otpCode")String otpCode,
                                      @RequestParam(name = "name")String name,@RequestParam(name = "gender")Integer gender,
-                                     @RequestParam(name = "age")Integer age,@RequestParam(name = "password")String password) throws BusinessException {
+                                     @RequestParam(name = "age")Integer age,@RequestParam(name = "password")String password) throws BusinessException, NoSuchAlgorithmException {
         //验证手机号和对应的otpCode是否相符合
         String inSessionOtpCode = (String) httpServletRequest.getSession().getAttribute(telphone);
-        if (StringUtils.equals(otpCode,inSessionOtpCode)){
+        if (!StringUtils.equals(otpCode,inSessionOtpCode)){
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"短信验证码不符合");
         }
         //用户注册流程
@@ -66,10 +70,17 @@ public class UserController extends BaseController {
         userModel.setName(name);
         userModel.setAge(age);
         userModel.setGender(new Byte(String.valueOf(gender.intValue())));
-        userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));
-        userModel.setRegisterMode("buphone");
+        userModel.setEncrptPassword(EncodeByMd5(password));
+        userModel.setRegisterMode("byphone");
         userService.register(userModel);
         return CommonReturnType.create(null);
+    }
+
+    public String EncodeByMd5(String str) throws NoSuchAlgorithmException {
+        //确定计算方法
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        String newstr = Base64.encodeBase64String(md5.digest(str.getBytes(StandardCharsets.UTF_8)));
+        return newstr;
     }
 
     @RequestMapping("/get")

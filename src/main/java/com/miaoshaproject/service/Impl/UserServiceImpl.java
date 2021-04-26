@@ -11,8 +11,11 @@ import com.miaoshaproject.service.model.UserModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.DuplicateFormatFlagsException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -48,7 +51,15 @@ public class UserServiceImpl implements UserService {
 
         //实现data到object的转换
         userDO = convertFromModel(userModel);
-        userDOMapper.insertSelective(userDO);
+
+        try{
+            userDOMapper.insertSelective(userDO);
+        }catch (DuplicateKeyException ex){
+            throw new BusinessException(EmBusinessError.UNKNOWN_ERROR,"手机号已存在");
+        }
+
+
+        userModel.setId(userDO.getId());
 
         UserPasswordDO userPasswordDO = new UserPasswordDO();
         userPasswordDO = convertFromModelPassword(userModel);
