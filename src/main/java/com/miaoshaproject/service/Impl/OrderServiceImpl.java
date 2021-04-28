@@ -81,6 +81,7 @@ public class OrderServiceImpl implements OrderService {
         //中间6位为自增序列
 
         //最后两位为分库分表位
+        return "";
     }
 
     private OrderDO convertFromOrderModel(OrderModel orderModel){
