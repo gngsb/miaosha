@@ -31,10 +31,13 @@
 <!--        <table tableName="user_password" domainObjectName="UserPasswordDO"-->
 <!--               enableCountByExample="false" enableUpdateByExample="false" selectByExampleQueryId="false"-->
 <!--               enableDeleteByExample="false" enableSelectByExample="false"></table>-->
-        <table tableName="item" domainObjectName="ItemDO"
-               enableCountByExample="false" enableUpdateByExample="false" selectByExampleQueryId="false"
-               enableDeleteByExample="false" enableSelectByExample="false"></table>
-        <table tableName="item_stock" domainObjectName="ItemStockDO"
+<!--        <table tableName="item" domainObjectName="ItemDO"-->
+<!--               enableCountByExample="false" enableUpdateByExample="false" selectByExampleQueryId="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"></table>-->
+<!--        <table tableName="item_stock" domainObjectName="ItemStockDO"-->
+<!--               enableCountByExample="false" enableUpdateByExample="false" selectByExampleQueryId="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"></table>-->
+        <table tableName="order_info" domainObjectName="OrderDO"
                enableCountByExample="false" enableUpdateByExample="false" selectByExampleQueryId="false"
                enableDeleteByExample="false" enableSelectByExample="false"></table>
         <!--<table tableName="item" domainObjectName="ItemDO"
