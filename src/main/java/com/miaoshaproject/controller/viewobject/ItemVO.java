@@ -1,5 +1,7 @@
 package com.miaoshaproject.controller.viewobject;
 
+import org.joda.time.DateTime;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -19,6 +21,50 @@ public class ItemVO {
     private Integer sales;
     //商品图片
     private String imgUrl;
+
+    //商品是否在秒杀活动中 0：没有秒杀活动 1：未开始 2：进行中 3：已结束
+    private Integer promoStatus;
+
+    //秒杀活动价格
+    private BigDecimal promoPrice;
+
+    //秒杀活动id
+    private Integer promoId;
+
+    //秒杀活动开始时间
+    private DateTime startDate;
+
+    public Integer getPromoStatus() {
+        return promoStatus;
+    }
+
+    public void setPromoStatus(Integer promoStatus) {
+        this.promoStatus = promoStatus;
+    }
+
+    public BigDecimal getPromoPrice() {
+        return promoPrice;
+    }
+
+    public void setPromoPrice(BigDecimal promoPrice) {
+        this.promoPrice = promoPrice;
+    }
+
+    public Integer getPromoId() {
+        return promoId;
+    }
+
+    public void setPromoId(Integer promoId) {
+        this.promoId = promoId;
+    }
+
+    public DateTime getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(DateTime startDate) {
+        this.startDate = startDate;
+    }
 
     public Integer getId() {
         return id;
