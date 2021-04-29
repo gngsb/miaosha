@@ -1,7 +1,9 @@
 package com.miaoshaproject.service.Impl;
 
 import com.miaoshaproject.dao.OrderDOMapper;
+import com.miaoshaproject.dao.SequenceDOMapper;
 import com.miaoshaproject.dataobject.OrderDO;
+import com.miaoshaproject.dataobject.SequenceDO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.service.ItemService;
@@ -13,9 +15,12 @@ import com.miaoshaproject.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -28,6 +33,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderDOMapper orderDOMapper;
+
+    @Autowired
+    private SequenceDOMapper sequenceDOMapper;
 
     @Override
     @Transactional
@@ -62,26 +70,47 @@ public class OrderServiceImpl implements OrderService {
         orderModel.setItemPrice(itemModel.getPrice());
 
         //生成交易流水号，订单号
-
+        orderModel.setId(generateOrderNo());
 
         OrderDO orderDO = convertFromOrderModel(orderModel);
 
         orderDOMapper.insertSelective(orderDO);
 
+        //加上商品的销量
+        itemService.increaseSales(itemId,amount);
+
         //4.返回前端
 
-        return null;
+        return orderModel;
     }
 
+
     //生成交易订单号
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private String generateOrderNo(){
         //订单号有16位
+        StringBuffer stringBuffer = new StringBuffer();
         //前8位为时间信息，年月日
+        LocalDateTime now = LocalDateTime.now();
+        String nowDate = now.format(DateTimeFormatter.ISO_DATE).replace("-","");
+        stringBuffer.append(nowDate);
 
         //中间6位为自增序列
+        //获取当前sequence
+        int sequence = 0;
+        SequenceDO sequenceDO = sequenceDOMapper.getSequenceByName("order_info");
+        sequence = sequenceDO.getCurrentValue();
+        sequenceDO.setCurrentValue(sequenceDO.getCurrentValue()+sequenceDO.getStep());
+        sequenceDOMapper.updateByPrimaryKeySelective(sequenceDO);
+        String sequenceStr = String.valueOf(sequence);
+        for (int i = 0;i<6-sequenceStr.length();i++){
+            stringBuffer.append(0);
+        }
+        stringBuffer.append(sequenceStr);
 
         //最后两位为分库分表位
-        return "";
+        stringBuffer.append("00");
+        return stringBuffer.toString();
     }
 
     private OrderDO convertFromOrderModel(OrderModel orderModel){
@@ -90,6 +119,8 @@ public class OrderServiceImpl implements OrderService {
         }
         OrderDO orderDO = new OrderDO();
         BeanUtils.copyProperties(orderModel,orderDO);
+        orderDO.setOrderPrice(orderModel.getOrderPrice().doubleValue());
+        orderDO.setItemPrice(orderModel.getItemPrice().doubleValue());
         return orderDO;
     }
 

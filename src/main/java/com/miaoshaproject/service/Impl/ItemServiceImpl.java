@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ItemServiceImpl implements ItemService {
+        public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ValidatorImpl validator;
@@ -109,6 +109,12 @@ public class ItemServiceImpl implements ItemService {
             //更新库存失败
             return false;
         }
+    }
+
+    @Override
+    @Transactional
+    public void increaseSales(Integer itemId, Integer amount) throws BusinessException {
+        itemDOMapper.increaseSales(itemId,amount);
     }
 
     private ItemModel convertfromDataObject(ItemDO itemDO,ItemStockDO itemStockDO){
