@@ -24,14 +24,16 @@ public class PromoServiceImpl implements PromoService {
 
         PromoModel promoModel = convertFromDataObject(promoDO);
 
-        //判断当前时间是否秒杀活动即将开始或正在进行
-        DateTime now = new DateTime();
-        if (promoModel.getStartDate().isAfterNow()){
-            promoModel.setStatus(1);
-        }else if (promoModel.getEndDate().isBeforeNow()){
-            promoModel.setStatus(3);
-        }else{
-            promoModel.setStatus(2);
+        if (promoModel!=null){
+            //判断当前时间是否秒杀活动即将开始或正在进行
+            DateTime now = new DateTime();
+            if (promoModel.getStartDate().isAfterNow()){
+                promoModel.setStatus(1);
+            }else if (promoModel.getEndDate().isBeforeNow()){
+                promoModel.setStatus(3);
+            }else{
+                promoModel.setStatus(2);
+            }
         }
 
         return promoModel;

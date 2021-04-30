@@ -1,7 +1,6 @@
 package com.miaoshaproject.service.model;
 
 import org.joda.time.DateTime;
-import sun.jvm.hotspot.types.CIntegerField;
 
 import java.math.BigDecimal;
 import java.util.Date;
