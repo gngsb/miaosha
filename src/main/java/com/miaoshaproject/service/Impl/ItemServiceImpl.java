@@ -16,7 +16,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +58,22 @@ public class ItemServiceImpl implements ItemService {
 
         //返回完成的对象
         return this.getItemById(itemModel.getId());
+    }
+
+    @Override
+    public String savePicture(MultipartFile file) throws IOException {
+
+        String name = file.getName();
+        String originName = file.getOriginalFilename();
+        String dir = System.getProperty("user.dir");
+        File file1 = new File(dir+"/picture/"+originName);
+        if (!file1.getParentFile().exists()){
+            file1.getParentFile().mkdir();
+        }
+
+        file.transferTo(file1);
+
+        return dir+"/picture/"+originName;
     }
 
     private ItemDO convertfromItemModel(ItemModel itemModel){

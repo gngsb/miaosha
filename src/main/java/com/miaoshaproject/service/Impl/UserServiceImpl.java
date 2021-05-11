@@ -11,6 +11,7 @@ import com.miaoshaproject.service.model.UserModel;
 import com.miaoshaproject.validator.ValidationResult;
 import com.miaoshaproject.validator.ValidatorImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -30,6 +31,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ValidatorImpl validator;
+
+    private static final Logger logger = Logger.getLogger(Logger.class);
 
     @Override
     public UserModel getUserById(Integer id) {
@@ -93,6 +96,9 @@ public class UserServiceImpl implements UserService {
         if (!com.alibaba.druid.util.StringUtils.equals(encrptPassword,userPasswordDO.getEncrptPassword())){
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
         }
+        logger.info("登录成功!info");
+        logger.debug("登录成功!debug");
+        logger.error("登录成功！error");
         return userModel;
     }
 

@@ -11,7 +11,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +40,29 @@ public class ItemController extends BaseController {
         itemModel.setPrice(price);
         itemModel.setDescription(description);
         itemModel.setImgUrl(imgUrl);
+        itemModel.setStock(stock);
+        ItemModel itemModelForReturn = itemService.createItem(itemModel);
+        ItemVO itemVO = convertVOFromModel(itemModelForReturn);
+        return CommonReturnType.create(itemVO);
+    }
+
+    //创建商品图片
+    @RequestMapping(value = "/createItemImg",method = {RequestMethod.POST})
+    @ResponseBody
+    public CommonReturnType createItemImg(@RequestParam(name = "title")String title,
+                                          @RequestParam(name = "price")BigDecimal price,
+                                          @RequestParam(name = "description")String description,
+                                          @RequestParam(name = "imgUrl")String imgUrl,
+                                          @RequestParam(name = "stock")Integer stock, @RequestParam("file")MultipartFile multipartFile) throws BusinessException, IOException {
+        System.out.println(multipartFile.getName());
+        //上传图片
+        String dir = itemService.savePicture(multipartFile);
+        //封装service请求用来创建商品
+        ItemModel itemModel = new ItemModel();
+        itemModel.setTitle(title);
+        itemModel.setPrice(price);
+        itemModel.setDescription(description);
+        itemModel.setImgUrl(dir);
         itemModel.setStock(stock);
         ItemModel itemModelForReturn = itemService.createItem(itemModel);
         ItemVO itemVO = convertVOFromModel(itemModelForReturn);
