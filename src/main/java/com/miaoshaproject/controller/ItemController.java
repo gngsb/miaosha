@@ -5,6 +5,7 @@ import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.response.CommonReturnType;
 import com.miaoshaproject.service.ItemService;
 import com.miaoshaproject.service.model.ItemModel;
+import com.miaoshaproject.tools.Logges;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +26,9 @@ public class ItemController extends BaseController {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private Logges logges;
 
     //创建商品
     @RequestMapping(value = "/createItem",method = {RequestMethod.POST})
@@ -54,7 +58,9 @@ public class ItemController extends BaseController {
                                           @RequestParam(name = "description")String description,
                                           @RequestParam(name = "imgUrl")String imgUrl,
                                           @RequestParam(name = "stock")Integer stock, @RequestParam("file")MultipartFile multipartFile) throws BusinessException, IOException {
-        System.out.println(multipartFile.getName());
+
+        logges.WriteErrorLog("開始寫入數據");
+
         //上传图片
         String dir = itemService.savePicture(multipartFile);
         //封装service请求用来创建商品
